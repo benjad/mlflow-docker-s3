@@ -1,0 +1,39 @@
+version: '3.7'
+
+services:
+    db:
+       	restart: always
+        image: mysql/mysql-server@sha256:5b40d96b11333570143d98d3a74100fefadb9abb17b27a95dbc9ad33544ec142
+        container_name: mlflow_db
+        env_file:
+            - .env
+        ports:
+            - "3306:3306"
+        environment:
+            - MYSQL_DATABASE=${MYSQL_DATABASE}
+            - MYSQL_USER=${MYSQL_USER}
+            - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+        volumes:
+            - dbdata:/var/lib/mysql
+
+    web:
+        restart: always
+        build: ./mlflow
+        image: mlflow_server
+        container_name: mlflow_server
+        depends_on:
+            - db
+        ports:
+            - "5000:5000"
+        volumes:
+            - ./basic_auth.ini:/home/basic_auth.ini
+        environment:
+            - MLFLOW_S3_ENDPOINT_URL=https://s3.amazonaws.com
+            - MLFLOW_ARTIFACT_URI=${AWS_S3_BUCKET}
+            - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+            - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+        command: mlflow server --backend-store-uri mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@db:3306/${MYSQL_DATABASE} --serve-artifacts  --artifacts-destination ${AWS_S3_BUCKET}  --host 0.0.0.0 --app-name basic-auth
+
+volumes:
+    dbdata:
