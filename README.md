@@ -14,7 +14,7 @@ Guide on how to deploy MLflow with AWS S3 as the artifact store.
 
 2. `cd` into the `mlflow-docker-compose` directory
 
-3. complete de .env file with your AWS credentials. You need  to also update  AWS_S3_BUCKET with the name of your actual bucket.  Remember that the credentials needs to have full access to the S3 repo.
+3. complete de `.env` file with your AWS credentials. You need  to also update  `AWS_S3_BUCKET`   with the name of your actual bucket.  Remember that the credentials needs to have full access to the S3 bucket.
 
 3. Build and run the containers with `docker-compose`
 
